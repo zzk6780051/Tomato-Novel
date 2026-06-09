@@ -514,20 +514,6 @@ jobs:
       - name: Checkout A Repository
         uses: actions/checkout@v4
 
-      - name: Checkout Tomato-Novel-Official-API (private)
-        uses: actions/checkout@v4
-        with:
-          repository: zhongbai2333/Tomato-Novel-Official-API
-          token: ${{ secrets.OAPI }}
-          path: Tomato-Novel-Official-API
-
-      - name: Link Official-API for path dependency
-        shell: powershell
-        run: |
-          $link = Join-Path $env:GITHUB_WORKSPACE '..\Tomato-Novel-Official-API'
-          if (Test-Path $link) { Remove-Item -Recurse -Force $link }
-          New-Item -ItemType Junction -Path $link -Target (Join-Path $env:GITHUB_WORKSPACE 'Tomato-Novel-Official-API') | Out-Null
-
       - name: Compute Cargo.lock hash
         id: cargo-lock-hash
         shell: bash
@@ -555,10 +541,14 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-            Tomato-Novel-Official-API/target
           key: ${{ runner.os }}-cargo-${{ steps.cargo-lock-hash.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-cargo-
+
+      - name: Switch to no-official-api (fork-friendly)
+        shell: bash
+        run: |
+          cp Cargo_no_official.toml Cargo.toml
 
       - name: Build release binary
         run: cargo build --release

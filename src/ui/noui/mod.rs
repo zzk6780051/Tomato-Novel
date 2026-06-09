@@ -27,6 +27,14 @@ pub(crate) fn download_book(book_id: &str, config: &Config) -> Result<()> {
     download::download_book(book_id, config)
 }
 
+pub(crate) fn download_book_non_interactive(
+    book_id: &str,
+    config: &Config,
+    retry_failed: bool,
+) -> Result<()> {
+    download::download_book_non_interactive(book_id, config, retry_failed)
+}
+
 pub(crate) fn update_existing_book_non_interactive(
     book_id: &str,
     config: &Config,

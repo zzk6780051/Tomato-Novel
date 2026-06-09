@@ -70,8 +70,8 @@ struct Cli {
     #[arg(long)]
     data_dir: Option<String>,
 
-    /// 已禁用：为防止滥用，CLI 模式不再支持新建下载（保留参数仅用于输出友好报错）
-    #[arg(long, hide = true)]
+    /// 下载指定 book_id 的小说（非交互模式）
+    #[arg(long)]
     download: Option<String>,
 
     /// 更新指定 book_id 的已下载小说（非交互模式）
@@ -138,10 +138,13 @@ fn main() -> Result<()> {
     if cli.download.is_some() || cli.update.is_some() {
         info!(target: "startup", "当前版本: v{}", VERSION);
 
-        if cli.download.is_some() {
-            return Err(anyhow!(
-                "出于防滥用考虑，CLI 模式已禁用新建下载；请先使用 Web UI / TUI 下载书籍，后续仅可通过 --update 更新本地已有小说。"
-            ));
+        if let Some(book_id) = cli.download.as_deref() {
+            println!("下载指定书籍 book_id={}", book_id);
+            return ui::noui::download_book_non_interactive(
+                book_id,
+                &config,
+                cli.retry_failed,
+            );
         }
 
         if let Some(book_id) = cli.update.as_deref() {
